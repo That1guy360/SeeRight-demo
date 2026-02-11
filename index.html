@@ -90,9 +90,8 @@
       varying vec2 v_uv;
 
       void main() {
-        vec2 uv = v_uv;
         uv.x = 1.0 - uv.x;
-
+         vec2 uv = v_uv;
         // Fix backwards (mirror) ONLY
         uv.x = 1.0 - uv.x;
 
