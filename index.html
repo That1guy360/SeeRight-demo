@@ -91,7 +91,9 @@
 
       void main() {
         vec2 uv = v_uv;
+        
         uv.y = 1.0 - uv.y;
+        
         uv.y = 1.0 -uv.y;   // Fix backwards (mirror) ONLY
 
         if (u_apply) {
