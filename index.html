@@ -137,8 +137,19 @@ function toggle() {
 const chartImg = document.getElementById("chart");
 chartImg.onload = () => {
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texImage2D(
+  const vertexShaderSource = `
+attribute vec2 a_position;
+varying vec2 v_uv;
+void main() {
+  // Fix upside-down + backwards here (one place only)
+  v_uv = vec2(
+    1.0 - ((a_position.x * 0.5) + 0.5),
+    1.0 - ((a_position.y * 0.5) + 0.5)
+  );
+  gl_Position = vec4(a_position, 0, 1);
+}
+`;
+   gl.texImage2D(
     gl.TEXTURE_2D,
     0,
     gl.RGBA,
