@@ -21,8 +21,19 @@ button { padding:8px 16px; margin:10px; }
 <br>
    <canvas id="glcanvas" width="400" height="400"></canvas>
    <img id="chart" src="snellen.png" crossorigin="anonymous" style="display:none;" />
+<script>
+  const canvas = document.getElementById("glcanvas");
+  const gl = canvas.getContext("webgl");
 
-  <div style="margin:18px auto; max-width:520px; text-align:left;">
+const vertexShaderSource = `
+attribute vec2 a_position;
+varying vec2 v_uv;
+void main() {
+  v_uv = (a_position * 0.5) + 0.5; // map -1..1 to 0..1
+  gl_Position = vec4(a_position, 0, 1);
+}
+`;
+<div style="margin:18px auto; max-width:520px; text-align:left;">
   <h3 style="margin:0 0 6px 0;">Get early access</h3>
   <div style="opacity:0.85; margin-bottom:10px;">
     Join the early release list. No spam. You’ll be first when Android builds drop.
@@ -37,21 +48,8 @@ button { padding:8px 16px; margin:10px; }
     Join Early Access
   </a>
 </div>
-<script>
-  const canvas = document.getElementById("glcanvas");
-  const gl = canvas.getContext("webgl");
-
-const vertexShaderSource = `
-attribute vec2 a_position;
-varying vec2 v_uv;
-void main() {
-  v_uv = (a_position * 0.5) + 0.5; // map -1..1 to 0..1
-  gl_Position = vec4(a_position, 0, 1);
-}
-`;
-
-const fragmentShaderSource = `
-precision mediump float;
+  const fragmentShaderSource = `
+  precision mediump float;
 
 uniform sampler2D u_tex;
 uniform float u_sphere;
