@@ -91,8 +91,7 @@
 
       void main() {
         uv.x = 1.0 - uv.x;
-         vec2 uv = v_uv;
-        // Fix backwards (mirror) ONLY
+        vec2 uv = v_uv;   // Fix backwards (mirror) ONLY
         uv.x = 1.0 - uv.x;
 
         if (u_apply) {
