@@ -1,188 +1,225 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SeeRight Demo</title>
-<style>
-body { font-family: Arial; text-align:center; background:#111; color:white; }
-input { margin:5px; padding:5px; }
-canvas { margin-top:20px; }
-button { padding:8px 16px; margin:10px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SeeRight Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:24px; background:#111; color:#fff; text-align:center; }
+    .wrap { max-width: 820px; margin: 0 auto; }
+    h1 { margin: 0 0 10px 0; font-size: 28px; }
+    .sub { opacity: 0.85; margin: 0 0 18px 0; }
+    .controls { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin: 10px 0 14px 0; }
+    input { padding:10px; border-radius:10px; border:1px solid #333; background:#0b0b0b; color:#fff; width:180px; }
+    button { padding:10px 14px; border-radius:10px; border:1px solid #fff; background:transparent; color:#fff; cursor:pointer; }
+    button:active { transform: translateY(1px); }
+    canvas { background:#fff; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .row { margin-top: 14px; }
+    .card { margin:18px auto 0 auto; max-width:520px; text-align:left; border:1px solid rgba(255,255,255,.18); border-radius:14px; padding:14px; }
+    .card h3 { margin:0 0 6px 0; font-size: 16px; }
+    .muted { opacity:.85; font-size: 14px; line-height: 1.35; }
+    .pill { display:inline-block; margin-top:10px; padding:10px 14px; border:1px solid #fff; border-radius:10px; text-decoration:none; color:#fff; }
+    #msg { margin-top:12px; font-size:14px; opacity:.9; min-height:18px; }
+    #err { text-align:left; white-space:pre-wrap; background:#300; color:#fff; padding:10px; border-radius:10px; margin-top:14px; display:none; }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>SeeRight</h1>
+    <p class="sub">Applies prescription-style correction to the display. Runs locally in your browser. No login. No uploads.</p>
 
-<h1>Use Your Screens Without Glasses or Contacts</h1>
+    <div class="controls">
+      <input type="number" id="sphere" placeholder="Sphere (e.g., -2.00)" step="0.25" />
+      <button id="applyBtn">Apply</button>
+      <button id="toggleBtn">Before / After</button>
+    </div>
 
-<input type="number" id="sphere" placeholder="Sphere (-2.00)" step="0.25">
-<button onclick="applyPrescription()">Apply</button>
-<button onclick="toggle()">Before / After</button>
+    <canvas id="glcanvas" width="500" height="500"></canvas>
 
-<br>
-   <canvas id="glcanvas" width="400" height="400"></canvas>
-   
-   <img id="chart" src="snellen.png" crossorigin="anonymous" style="display:none;" />
-   
-<script>
-  const canvas = document.getElementById("glcanvas");
-  const gl = canvas.getContext("webgl");
-  const vertexShaderSource = `
-attribute vec2 a_position;
-varying vec2 v_uv;
-void main() {
-  v_uv = (a_position * 0.5) + 0.5; // map -1..1 to 0..1
-  gl_Position = vec4(a_position, 0, 1);
-}
-`;
-  const fragmentShaderSource = `
-  precision mediump float;
+    <!-- Hidden chart image used as the WebGL texture -->
+    <img id="chart" src="snellen.png" alt="Snellen chart" crossorigin="anonymous" style="display:none;" />
 
-uniform sampler2D u_tex;
-uniform float u_sphere;
-uniform bool u_apply;
+    <div class="row">
+      <div>Did this improve clarity?</div>
+      <div class="controls" style="margin-top:8px;">
+        <button id="fbYes">Yes</button>
+        <button id="fbNo">No</button>
+      </div>
+      <div id="msg"></div>
+    </div>
 
-varying vec2 v_uv;
+    <div class="card">
+      <h3>Get early access</h3>
+      <div class="muted">Join the early release list. No spam. You’ll be first when Android builds drop.</div>
+      <a class="pill" href="PASTE_YOUR_GOOGLE_FORM_LINK_HERE" target="_blank" rel="noopener">Join Early Access</a>
+    </div>
 
-void main() {
-  
-vec2 uv = v_uv;
-uv.x = 1.0 - uv.x;
-uv.y = 1.0 - uv.y; 
-uv.x = 1.0 - uv.x; 
-  
-if (u_apply) {
-    vec2 c = uv - 0.5;
-    float r2 = dot(c, c);
-    float k = u_sphere * 0.35;
-    uv = uv + c * (k * r2);
-  }
-  uv = clamp(uv, 0.0, 1.0);
-  gl_FragColor = texture2D(u_tex, uv);
-};
-function compileShader(type, source) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  return shader;
-}
-const vertexShader = compileShader(gl.VERTEX_SHADER, vertexShaderSource);
-const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
-const program = gl.createProgram();
-gl.attachShader(program, vertexShader);
-gl.attachShader(program, fragmentShader);
-gl.linkProgram(program);
-gl.useProgram(program);
-const texLocation = gl.getUniformLocation(program, "u_tex");
+    <pre id="err"></pre>
+  </div>
 
-const texture = gl.createTexture();
-gl.bindTexture(gl.TEXTURE_2D, texture);
+  <script>
+    const errBox = document.getElementById("err");
+    function showErr(msg){
+      errBox.style.display = "block";
+      errBox.textContent = msg;
+    }
+    window.onerror = (m, s, l, c) => showErr(`JS ERROR: ${m}\n${s}:${l}:${c}`);
 
-gl.texImage2D(
-  gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0,
-  gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,255])
-);
+    const canvas = document.getElementById("glcanvas");
+    const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
 
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    if (!gl) {
+      showErr("WebGL not available in this browser/device.");
+      throw new Error("WebGL not available");
+    }
 
-gl.activeTexture(gl.TEXTURE0);
-gl.bindTexture(gl.TEXTURE_2D, texture);
-gl.uniform1i(texLocation, 0);
+    const vertexShaderSource = `
+      attribute vec2 a_position;
+      varying vec2 v_uv;
+      void main() {
+        v_uv = (a_position * 0.5) + 0.5;   // -1..1 -> 0..1
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `;
 
-function draw() {
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
-}
+    const fragmentShaderSource = `
+      precision mediump float;
+      uniform sampler2D u_tex;
+      uniform float u_sphere;
+      uniform bool u_apply;
+      varying vec2 v_uv;
 
-const positionBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-  -1, -1,
-   1, -1,
-  -1,  1,
-  -1,  1,
-   1, -1,
-   1,  1,
-]), gl.STATIC_DRAW);
+      void main() {
+        vec2 uv = v_uv;
 
-const positionLocation = gl.getAttribLocation(program, "a_position");
-gl.enableVertexAttribArray(positionLocation);
-gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+        // Fix backwards (mirror) ONLY
+        uv.x = 1.0 - uv.x;
 
-const sphereLocation = gl.getUniformLocation(program, "u_sphere");
-const applyLocation = gl.getUniformLocation(program, "u_apply");
+        if (u_apply) {
+          // MVP radial distortion (stand-in for full rx model)
+          vec2 c = uv - 0.5;
+          float r2 = dot(c, c);
+          float k = u_sphere * 0.15;  // tighter, more believable
+          uv = uv + c * (k * r2);
+        }
 
-let applyEffect = false;
-gl.uniform1f(sphereLocation, 0.0);
-gl.uniform1i(applyLocation, 0);
+        uv = clamp(uv, 0.0, 1.0);
+        gl_FragColor = texture2D(u_tex, uv);
+      }
+    `;
 
-function applyPrescription() {
-  const sphere = parseFloat(document.getElementById("sphere").value) || 0.0;
-  gl.uniform1f(sphereLocation, sphere);
-  applyEffect = true;
-  gl.uniform1i(applyLocation, 1);
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
-}
+    function compileShader(type, source) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, source);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        const info = gl.getShaderInfoLog(sh) || "Unknown shader error";
+        showErr("SHADER COMPILE FAIL:\n" + info);
+        throw new Error(info);
+      }
+      return sh;
+    }
 
-function toggle() {
-  applyEffect = !applyEffect;
-  gl.uniform1i(applyLocation, applyEffect ? 1 : 0);
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
-}
-const chartImg = document.getElementById("chart");
-chartImg.onload = () => {
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  const vertexShaderSource = `
-attribute vec2 a_position;
-varying vec2 v_uv;
-void main() {
-  v_uv = vec2(
-    1.0 - ((a_position.x * 0.5) + 0.5),
-    1.0 - ((a_position.y * 0.5) + 0.5)
-  );
-  gl_Position = vec4(a_position, 0, 1);
-}
-`;
-   gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    chartImg
-  );
-  draw();
-};
-draw();
-</script>
-<div style="margin-top:16px;">
-  <div>Did this improve clarity?</div>
-  <button id="fbYes">Yes</button>
-  <button id="fbNo">No</button>
-  <div id="fbThanks" style="margin-top:10px;"></div>
-</div>
+    const vs = compileShader(gl.VERTEX_SHADER, vertexShaderSource);
+    const fs = compileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-<script>
-  function track(eventName){
-    console.log("EVENT:", eventName, new Date().toISOString());
-  }
-  document.getElementById("fbYes").onclick = () => {
-    track("feedback_yes");
-    document.getElementById("fbThanks").innerHTML =
-      'Thanks. Email for updates: <a href="mailto:seeright.demo+updates@gmail.com">click here</a>';
-  };
-   document.getElementById("fbNo").onclick = () => {
-    track("feedback_no");
-    document.getElementById("fbThanks").innerText =
-      "Thanks. Tell me your sphere value in the comments.";
-  };
-</script>
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
 
-</body>
-</html>
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      const info = gl.getProgramInfoLog(program) || "Unknown program link error";
+      showErr("PROGRAM LINK FAIL:\n" + info);
+      throw new Error(info);
+    }
 
+    gl.useProgram(program);
 
+    // Fullscreen quad
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1,
+       1, -1,
+      -1,  1,
+      -1,  1,
+       1, -1,
+       1,  1
+    ]), gl.STATIC_DRAW);
+
+    const posLoc = gl.getAttribLocation(program, "a_position");
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    // Uniforms
+    const sphereLoc = gl.getUniformLocation(program, "u_sphere");
+    const applyLoc  = gl.getUniformLocation(program, "u_apply");
+    const texLoc    = gl.getUniformLocation(program, "u_tex");
+
+    gl.uniform1f(sphereLoc, 0.0);
+    gl.uniform1i(applyLoc, 0);
+
+    // Texture setup
+    const texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1i(texLoc, 0);
+
+    // 1x1 placeholder until image loads
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0,
+                  gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255,255,255,255]));
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    function draw() {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(1, 1, 1, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    // Load chart into texture
+    const chartImg = document.getElementById("chart");
+    chartImg.onload = () => {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, chartImg);
+      draw();
+    };
+    chartImg.onerror = () => showErr("Image failed to load: snellen.png (must be in repo root).");
+
+    // Controls
+    let applyEffect = false;
+
+    document.getElementById("applyBtn").onclick = () => {
+      const sphere = parseFloat(document.getElementById("sphere").value) || 0.0;
+      gl.uniform1f(sphereLoc, sphere);
+      applyEffect = true;
+      gl.uniform1i(applyLoc, 1);
+      draw();
+    };
+
+    document.getElementById("toggleBtn").onclick = () => {
+      applyEffect = !applyEffect;
+      gl.uniform1i(applyLoc, applyEffect ? 1 : 0);
+      draw();
+    };
+
+    // Feedback
+    const msg = document.getElementById("msg");
+    document.getElementById("fbYes").onclick = () => {
+      msg.innerHTML = 'Thanks. Join early access above, or email: <a style="color:#9cf;" href="mailto:seeright.demo+updates@gmail.com?subject=SeeRight%20Early%20Access">seeright.demo+updates@gmail.com</a>';
+    };
+    document.getElementById("fbNo").onclick = () => {
+      msg.textContent = "Thanks. Comment with your sphere value + device model so I can tune it.";
+    };
+
+    // Initial draw (shows placeholder until image loads)
+    draw();
+  </script>
 </body>
 </html>
