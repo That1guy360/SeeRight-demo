@@ -48,10 +48,11 @@ varying vec2 v_uv;
 void main() {
   
 vec2 uv = v_uv;
- uv.y = 1.0 - uv.y; 
- uv.x = 1.0 - uv.x; 
+uv.x = 1.0 - uv.x;
+uv.y = 1.0 - uv.y; 
+uv.x = 1.0 - uv.x; 
   
-  if (u_apply) {
+if (u_apply) {
     vec2 c = uv - 0.5;
     float r2 = dot(c, c);
     float k = u_sphere * 0.35;
