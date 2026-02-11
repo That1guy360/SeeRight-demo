@@ -102,5 +102,36 @@ function toggle() {
 gl.drawArrays(gl.TRIANGLES, 0, 6);
 </script>
 
+  <!-- EXISTING CANVAS ABOVE -->
+
+<div style="margin-top:16px;">
+  <div>Did this improve clarity?</div>
+  <button id="fbYes">Yes</button>
+  <button id="fbNo">No</button>
+  <div id="fbThanks" style="margin-top:10px;"></div>
+</div>
+
+<script>
+  function track(eventName){
+    console.log("EVENT:", eventName, new Date().toISOString());
+  }
+
+  document.getElementById("fbYes").onclick = () => {
+    track("feedback_yes");
+    document.getElementById("fbThanks").innerHTML =
+      'Thanks. Email for updates: <a href="mailto:seeright.demo+updates@gmail.com">click here</a>';
+  };
+
+  document.getElementById("fbNo").onclick = () => {
+    track("feedback_no");
+    document.getElementById("fbThanks").innerText =
+      "Thanks. Tell me your sphere value in the comments.";
+  };
+</script>
+
+</body>
+</html>
+
+
 </body>
 </html>
