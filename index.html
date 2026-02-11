@@ -93,7 +93,7 @@
         vec2 uv = v_uv;
         uv.y = 1.0 - uv.y;
 
-        uv.x = 1.0 - uv.x;
+        uv.x = 1.0 - uv.x; // keep this if already fixing mirror
 
         if (u_apply) {
           // MVP radial distortion (stand-in for full rx model)
