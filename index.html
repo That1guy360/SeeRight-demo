@@ -19,10 +19,8 @@ button { padding:8px 16px; margin:10px; }
 <button onclick="toggle()">Before / After</button>
 
 <br>
-<canvas id="glcanvas" width="400" height="400"></canvas>
-
+<canvas id="glcanvas" width="500" height="500" style="background:white;"></canvas>
 <img id="chart" src="snellen.png" crossorigin="anonymous" style="display:none;" />
-
 <script>
 const canvas = document.getElementById("glcanvas");
 const gl = canvas.getContext("webgl");
@@ -59,10 +57,8 @@ if (u_apply) {
     uv = uv + c * (k * r2);
   }
   uv = clamp(uv, 0.0, 1.0);
- 
   gl_FragColor = texture2D(u_tex, uv);
-}
-`;
+};
 function compileShader(type, source) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
@@ -142,7 +138,6 @@ chartImg.onload = () => {
 attribute vec2 a_position;
 varying vec2 v_uv;
 void main() {
-  // Fix upside-down + backwards here (one place only)
   v_uv = vec2(
     1.0 - ((a_position.x * 0.5) + 0.5),
     1.0 - ((a_position.y * 0.5) + 0.5)
