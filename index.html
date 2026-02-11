@@ -90,11 +90,9 @@
       varying vec2 v_uv;
 
       void main() {
-        vec2 uv = v_uv;
-        
-        uv.y = 1.0 - uv.y;
-        
-        uv.y = 1.0 -uv.y;   // Fix backwards (mirror) ONLY
+vec2 uv = v_uv;
+uv.y = 1.0 - uv.y;
+uv.x = 1.0 - uv.x;   // keep this if already fixing mirror
 
         if (u_apply) {
           // MVP radial distortion (stand-in for full rx model)
