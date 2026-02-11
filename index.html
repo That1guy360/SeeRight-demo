@@ -135,6 +135,19 @@ function toggle() {
   gl.uniform1i(applyLocation, applyEffect ? 1 : 0);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
+const chartImg = document.getElementById("chart");
+chartImg.onload = () => {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    chartImg
+  );
+  draw();
+};
 draw();
 </script>
 <div style="margin-top:16px;">
@@ -148,14 +161,12 @@ draw();
   function track(eventName){
     console.log("EVENT:", eventName, new Date().toISOString());
   }
-
   document.getElementById("fbYes").onclick = () => {
     track("feedback_yes");
     document.getElementById("fbThanks").innerHTML =
       'Thanks. Email for updates: <a href="mailto:seeright.demo+updates@gmail.com">click here</a>';
   };
-
-  document.getElementById("fbNo").onclick = () => {
+   document.getElementById("fbNo").onclick = () => {
     track("feedback_no");
     document.getElementById("fbThanks").innerText =
       "Thanks. Tell me your sphere value in the comments.";
