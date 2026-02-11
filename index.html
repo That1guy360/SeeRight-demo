@@ -19,9 +19,12 @@ button { padding:8px 16px; margin:10px; }
 <button onclick="toggle()">Before / After</button>
 
 <br>
-<canvas id="glcanvas" width="500" height="500" style="background:white;"></canvas>
-<img id="chart" src="snellen.png" crossorigin="anonymous" style="display:none;" />
-<script>
+
+  <canvas id="glcanvas" width="500" height="500" style="background:white;"></canvas>
+
+  <img id="chart" src="snellen.png" crossorigin="anonymous" style="display:none;" />
+
+  <script>
 const canvas = document.getElementById("glcanvas");
 const gl = canvas.getContext("webgl");
 
