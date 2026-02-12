@@ -223,9 +223,10 @@ if (chartImg.complete && chartImg.naturalWidth > 0) {
 
     // Feedback
     const msg = document.getElementById("msg");
-    document.getElementById("fbYes").onclick = () => {
-    msg.innerHTML = 'Thanks. Join early access above, or email: <a style="color:#9cf;" href="mailto:see.right.2020@gmail.com?subject=SeeRight%20Early%20Access">see.right.2020@gmail.com</a>';
-    document.getElementById("fbNo").onclick = () => {
+   document.getElementById("fbYes").onclick = () => {
+  msg.textContent = "Thanks. Email: see.right.2020@gmail.com";
+};
+   document.getElementById("fbNo").onclick = () => {
     msg.textContent = "Thanks. Comment with your sphere value + device model so I can tune it.";
     };
 
