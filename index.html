@@ -26,7 +26,7 @@
 <body>
   <div class="wrap">
     <h1>SeeRight</h1>
-    <p class="sub"Join the movement on vision correction.></p>
+    <p class="sub">Join the movement on vision correction. Runs locally in your browser. No login. No uploads.</p>
 
     <div class="controls">
       <input type="number" id="sphere" placeholder="Sphere (e.g., -2.00)" step="0.25" />
@@ -83,30 +83,33 @@
     `;
 
     const fragmentShaderSource = `
-precision mediump float;
+      precision mediump float;
 
-uniform sampler2D u_tex;
-uniform float u_sphere;
-uniform bool u_apply;
+      uniform sampler2D u_tex;
+      uniform float u_sphere;
+      uniform bool u_apply;
 
-varying vec2 v_uv;
+      varying vec2 v_uv;
 
-void main() {
-  vec2 uv = v_uv;
-  uv.y = 1.0 - uv.y;
-  
-    if (u_apply) {
-    vec2 c = uv - 0.5;
-    float r2 = dot(c, c);
-    float k = u_sphere * 0.15;
-    uv = uv + c * (k * r2);
-  }
-  uv = clamp(uv, 0.0, 1.0);
-  gl_FragColor = texture2D(u_tex, uv);
-}
-`;
+      void main() {
+        vec2 uv = v_uv;
 
-      function compileShader(type, source) {
+        // Fix upside-down chart
+        uv.y = 1.0 - uv.y;
+
+        if (u_apply) {
+          vec2 c = uv - 0.5;
+          float r2 = dot(c, c);
+          float k = u_sphere * 0.15;
+          uv = uv + c * (k * r2);
+        }
+
+        uv = clamp(uv, 0.0, 1.0);
+        gl_FragColor = texture2D(u_tex, uv);
+      }
+    `;
+
+    function compileShader(type, source) {
       const sh = gl.createShader(type);
       gl.shaderSource(sh, source);
       gl.compileShader(sh);
@@ -165,8 +168,10 @@ void main() {
     gl.uniform1i(texLoc, 0);
 
     // 1x1 placeholder until image loads
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0,
-                  gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255,255,255,255]));
+    gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0,
+      gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255,255,255,255])
+    );
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -216,7 +221,7 @@ void main() {
       msg.textContent = "Thanks. Comment with your sphere value + device model so I can tune it.";
     };
 
-    // Initial draw (shows placeholder until image loads)
+    // Initial draw (placeholder until image loads)
     draw();
   </script>
 </body>
