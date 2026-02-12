@@ -194,9 +194,16 @@ void main() {
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
     // Uniforms
-    const sphereLoc = gl.getUniformLocation(program, "u_sphere");
-    const applyLoc  = gl.getUniformLocation(program, "u_apply");
-    const texLoc    = gl.getUniformLocation(program, "u_tex");
+const sphereLoc = gl.getUniformLocation(program, "u_sphere");
+const applyLoc  = gl.getUniformLocation(program, "u_apply");
+const texLoc    = gl.getUniformLocation(program, "u_tex");
+
+// ADD THESE RIGHT HERE
+const simLoc = gl.getUniformLocation(program, "u_sim");
+const pxLoc  = gl.getUniformLocation(program, "u_px");
+
+gl.uniform1i(simLoc, 1);
+gl.uniform2f(pxLoc, 1.0 / canvas.width, 1.0 / canvas.height);
 
     gl.uniform1f(sphereLoc, 0.0);
     gl.uniform1i(applyLoc, 0);
