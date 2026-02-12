@@ -82,44 +82,74 @@
       }
     `;
 
-    const fragmentShaderSource = `
-      precision mediump float;
+const fragmentShaderSource = `
+precision mediump float;
 
-      uniform sampler2D u_tex;
-      uniform float u_sphere;
-      uniform bool u_apply;
+uniform sampler2D u_tex;
+uniform float u_sphere;
+uniform bool u_apply;
 
-      varying vec2 v_uv;
+uniform bool u_sim;     // NEW: simulate blur driven by sphere
+uniform vec2 u_px;      // NEW: 1.0/width, 1.0/height
 
-      void main() {
-        vec2 uv = v_uv;
+varying vec2 v_uv;
 
-        // Fix upside-down chart
-        uv.y = 1.0 - uv.y;
+vec4 blur9(sampler2D t, vec2 uv, vec2 px, float amt) {
+  // amt scales sample radius; keep subtle
+  vec2 r = px * amt;
 
-if (u_apply) {
-  vec2 c = uv - 0.5;
+  vec4 c = vec4(0.0);
+  c += texture2D(t, uv + r * vec2(-1.0,-1.0)) * 0.0625;
+  c += texture2D(t, uv + r * vec2( 0.0,-1.0)) * 0.125;
+  c += texture2D(t, uv + r * vec2( 1.0,-1.0)) * 0.0625;
 
-  // Normalize by aspect so distortion is circular, not oval
-  vec2 ca = vec2(c.x, c.y);
-  float r2 = dot(ca, ca);
+  c += texture2D(t, uv + r * vec2(-1.0, 0.0)) * 0.125;
+  c += texture2D(t, uv + r * vec2( 0.0, 0.0)) * 0.25;
+  c += texture2D(t, uv + r * vec2( 1.0, 0.0)) * 0.125;
 
-  // Map sphere to a subtle strength (keeps it realistic)
-  float s = clamp(u_sphere, -10.0, 10.0);
-  float k1 = s * 0.06;   // primary
-  float k2 = s * 0.02;   // secondary (smooths extremes)
+  c += texture2D(t, uv + r * vec2(-1.0, 1.0)) * 0.0625;
+  c += texture2D(t, uv + r * vec2( 0.0, 1.0)) * 0.125;
+  c += texture2D(t, uv + r * vec2( 1.0, 1.0)) * 0.0625;
 
-  // Optical-style radial distortion (polynomial)
-  float factor = 1.0 + k1 * r2 + k2 * r2 * r2;
-
-  uv = 0.5 + c * factor;
+  return c;
 }
-        uv = clamp(uv, 0.002, 0.998);
-        gl_FragColor = texture2D(u_tex, uv);
-      }
-    `;
 
-    function compileShader(type, source) {
+void main() {
+  vec2 uv = v_uv;
+
+  // chart upright (keep)
+  uv.y = 1.0 - uv.y;
+
+  // OPTIONAL: blur simulation driven by |sphere|
+  vec4 base;
+  if (u_sim) {
+    float s = clamp(abs(u_sphere), 0.0, 10.0);
+    float amt = s * 2.0;        // 0 at 0.00, grows with sphere
+    base = blur9(u_tex, uv, u_px, amt);
+  } else {
+    base = texture2D(u_tex, uv);
+  }
+
+  // APPLY correction distortion (your existing correction)
+  if (u_apply) {
+    vec2 c = uv - 0.5;
+    float r2 = dot(c, c);
+    float s = clamp(u_sphere, -10.0, 10.0);
+    float k1 = s * 0.06;
+    float k2 = s * 0.02;
+    float factor = 1.0 + k1 * r2 + k2 * r2 * r2;
+    uv = 0.5 + c * factor;
+    uv = clamp(uv, 0.002, 0.998);
+
+    // after warp, sample again (blur sim should be "before", correction is "after")
+    gl_FragColor = texture2D(u_tex, uv);
+  } else {
+    // before: show unwarped image (blur sim may apply here)
+    gl_FragColor = base;
+  }
+}
+`;
+      function compileShader(type, source) {
       const sh = gl.createShader(type);
       gl.shaderSource(sh, source);
       gl.compileShader(sh);
