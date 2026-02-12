@@ -83,29 +83,31 @@
     `;
 
     const fragmentShaderSource = `
-    recision mediump float;
-    uniform sampler2D u_tex;
-    uniform float u_sphere;
-    uniform bool u_apply;
+precision mediump float;
 
-      varying vec2 v_uv;
+uniform sampler2D u_tex;
+uniform float u_sphere;
+uniform bool u_apply;
 
-      void main() {
-      vec2 uv = v_uv;
-    // Fix backwards (mirror)
-    uv.x = 1.0 - uv.x;
+varying vec2 v_uv;
 
-    if (u_apply) {
+void main() {
+  vec2 uv = v_uv;
+  uv.y = 1.0 - uv.y;
+  uv.x = 1.0 - uv.x;
+
+  if (u_apply) {
     vec2 c = uv - 0.5;
     float r2 = dot(c, c);
     float k = u_sphere * 0.15;
     uv = uv + c * (k * r2);
   }
 
-    uv = clamp(uv, 0.0, 1.0);
+  uv = clamp(uv, 0.0, 1.0);
   gl_FragColor = texture2D(u_tex, uv);
 }
 `;
+
       function compileShader(type, source) {
       const sh = gl.createShader(type);
       gl.shaderSource(sh, source);
