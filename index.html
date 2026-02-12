@@ -185,7 +185,6 @@
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
     
-   // Load chart into texture
    const chartImg = document.getElementById("chart");
 
 function uploadChartTextureAndDraw() {
@@ -194,6 +193,15 @@ function uploadChartTextureAndDraw() {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, chartImg);
   draw();
 }
+
+chartImg.onload = uploadChartTextureAndDraw;
+chartImg.onerror = () => showErr("Image failed to load: snellen.png (must be in repo root).");
+
+// If cached, onload may not fire:
+if (chartImg.complete && chartImg.naturalWidth > 0) {
+  uploadChartTextureAndDraw();
+}
+
 
 chartImg.onload = uploadChartTextureAndDraw;
 chartImg.onerror = () => showErr("Image failed to load: snellen.png (must be in repo root).");
