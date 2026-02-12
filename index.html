@@ -225,14 +225,16 @@ gl.uniform2f(pxLoc, 1.0 / canvas.width, 1.0 / canvas.height);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-    function draw() {
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.clearColor(1, 1, 1, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }
-    
-   const chartImg = document.getElementById("chart");
+function draw() {
+  // keep px correct (in case canvas changes later)
+  gl.uniform2f(pxLoc, 1.0 / canvas.width, 1.0 / canvas.height);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(1, 1, 1, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+const chartImg = document.getElementById("chart");
 
 function uploadChartTextureAndDraw() {
   gl.activeTexture(gl.TEXTURE0);
