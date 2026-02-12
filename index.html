@@ -184,8 +184,7 @@
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
-
-    // Load chart into texture
+    
     const chartImg = document.getElementById("chart");
     chartImg.onload = () => {
       gl.activeTexture(gl.TEXTURE0);
@@ -195,8 +194,7 @@
     };
     chartImg.onerror = () => showErr("Image failed to load: snellen.png (must be in repo root).");
 
-    // Controls
-    let applyEffect = false;
+   let applyEffect = false;
 
     document.getElementById("applyBtn").onclick = () => {
       const sphere = parseFloat(document.getElementById("sphere").value) || 0.0;
@@ -212,17 +210,13 @@
       draw();
     };
 
-    // Feedback
     const msg = document.getElementById("msg");
     document.getElementById("fbYes").onclick = () => {
-      msg.innerHTML = 'Thanks. Join early access above, or email: <a style="color:#9cf;" href="mailto:see.right2020@gmail.com?subject=SeeRight%20Early%20Access">seeright.demo+updates@gmail.com</a>';
-    };
-    document.getElementById("fbNo").onclick = () => {.
+     msg.innerHTML = 'Thanks. Join early access above, or email: <a style="color:#9cf;" href="mailto:see.right.2020@gmail.com?subject=SeeRight%20Early%20Access">see.right.2020@gmail.com</a>';
+     document.getElementById("fbNo").onclick = () => {.
       msg.textContent = "Thanks. Comment with your sphere value + device model so I can tune it.";
     };
-
-    // Initial draw (placeholder until image loads)
-    draw();
+   draw();
   </script>
 </body>
 </html>
