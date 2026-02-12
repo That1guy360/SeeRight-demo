@@ -186,14 +186,23 @@
     }
     
    // Load chart into texture
-    const chartImg = document.getElementById("chart");
-    chartImg.onload = () => {
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, chartImg);
-      draw();
-    };
-    chartImg.onerror = () => showErr("Image failed to load: snellen.png (must be in repo root).");
+   const chartImg = document.getElementById("chart");
+
+function uploadChartTextureAndDraw() {
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, chartImg);
+  draw();
+}
+
+chartImg.onload = uploadChartTextureAndDraw;
+chartImg.onerror = () => showErr("Image failed to load: snellen.png (must be in repo root).");
+
+// If the image is already cached, onload may not fire—force it:
+if (chartImg.complete && chartImg.naturalWidth > 0) {
+  uploadChartTextureAndDraw();
+}
+;
 
     // Controls
     let applyEffect = false;
