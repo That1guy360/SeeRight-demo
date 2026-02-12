@@ -97,13 +97,23 @@
         // Fix upside-down chart
         uv.y = 1.0 - uv.y;
 
-        if (u_apply) {
-          vec2 c = uv - 0.5;
-          float r2 = dot(c, c);
-          float k = u_sphere * 0.15;
-          uv = uv + c * (k * r2);
-        }
+if (u_apply) {
+  vec2 c = uv - 0.5;
 
+  // Normalize by aspect so distortion is circular, not oval
+  vec2 ca = vec2(c.x, c.y);
+  float r2 = dot(ca, ca);
+
+  // Map sphere to a subtle strength (keeps it realistic)
+  float s = clamp(u_sphere, -10.0, 10.0);
+  float k1 = s * 0.06;   // primary
+  float k2 = s * 0.02;   // secondary (smooths extremes)
+
+  // Optical-style radial distortion (polynomial)
+  float factor = 1.0 + k1 * r2 + k2 * r2 * r2;
+
+  uv = 0.5 + c * factor;
+}
         uv = clamp(uv, 0.0, 1.0);
         gl_FragColor = texture2D(u_tex, uv);
       }
