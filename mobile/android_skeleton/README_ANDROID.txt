@@ -1,0 +1,1 @@
+Android skeleton for SeeRight. Import into Android Studio.

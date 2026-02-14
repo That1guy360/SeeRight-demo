@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <rect width="100%" height="100%" fill="#ffffff"></rect>
+  <!-- top lines (very blurred/small) -->
+  <text x="50%" y="12%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="72" fill="#000" opacity="0.12">A B C D E</text>
+  <text x="50%" y="22%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="64" fill="#000" opacity="0.18">F G H I J K</text>
+  <text x="50%" y="34%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="56" fill="#000" opacity="0.26">L M N O P Q R</text>
+
+  <!-- central brand line (only clear word) -->
+  <g>
+    <!-- surrounding faint letters -->
+    <text x="50%" y="50%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="84" fill="#000" opacity="0.08">S E E R I G H T</text>
+    <!-- bold, crisp SeeRight that is clearly visible -->
+    <text x="50%" y="50%" text-anchor="middle" font-family="Helvetica Neue, Arial" font-weight="700" font-size="84" fill="#000">SeeRight</text>
+  </g>
+
+  <!-- bottom lines -->
+  <text x="50%" y="66%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="40" fill="#000" opacity="0.20">T U V W X Y Z</text>
+  <text x="50%" y="78%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" fill="#000" opacity="0.12">1 2 3 4 5 6</text>
+
+  <!-- simple caption -->
+  <text x="50%" y="92%" text-anchor="middle" font-family="Arial" font-size="16" fill="#444">SeeRight — screen-based vision calibration &amp; correction</text>
+</svg>

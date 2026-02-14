@@ -1,0 +1,41 @@
+﻿# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+.vite/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*
+
+# Keep legacy bundles, but ignore extracted junk
+legacy/extracted/
+legacy/inbox/
+
+# Large binaries / local archives (keep local, dont push to GitHub)
+*.zip
+legacy/bundles/
+legacy/backups/
+legacy/demos/
+
+# Saved GitHub page snapshot (not part of the real app)
+app/web-demo/public/seeright-demo.html
+app/web-demo/public/seeright-demo_files/
+
+# History assets (local reference)
+docs/history/assets/
+docs/history/*.docx

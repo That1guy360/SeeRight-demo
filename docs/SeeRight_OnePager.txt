@@ -1,0 +1,11 @@
+SeeRight — Your prescription, in every screen. (Patent-pending)
+
+SeeRight converts any digital screen into a personalized corrective display by applying real-time GPU distortion driven by a user's prescription (sphere, cylinder, axis). With AI-powered blur detection and an accessible calibration flow, SeeRight offers glasses-free clarity for phones, tablets, laptops, and future AR devices. Deployable as an installable PWA and native packages—ideal for consumers and OEM licensing.
+
+Key Features:
+- Prescription-driven shader correction (myopia, hyperopia, astigmatism)
+- AI blur detection and auto-suggestion
+- Tap-to-align calibration and voice guidance
+- PWA + native packaging for OEM licensing
+
+Contact: [Your Name] • [email] • [phone]

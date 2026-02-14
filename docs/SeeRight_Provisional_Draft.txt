@@ -1,0 +1,6 @@
+Title: System and Method for Vision-Correcting Display Using User Prescription and Real-Time Distortion
+
+Abstract:
+A system and method for dynamically adjusting digital display output to match a user's optical prescription, including myopia, hyperopia, and astigmatism, via real-time GPU-based distortion. The system accepts prescription parameters (sphere, cylinder, axis), applies shader-based pixel transformations to simulate corrective optics on the display, and optionally uses AI blur detection from camera or uploaded images to suggest and refine correction parameters. Calibration tools allow user alignment and confirmation. The system is implemented as a PWA or native app and may be licensed to device OEMs.
+
+(Full detailed description and claims available in draft. Use for provisional filing and follow with utility filing within 12 months.)

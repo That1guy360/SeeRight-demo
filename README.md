@@ -1,9 +1,21 @@
-# SeeRight
+﻿# SeeRight
 
-SeeRight applies your prescription directly to digital screens using real-time GPU distortion so you can see clearly without glasses.
+## Start here (in order)
+1. docs/C-Right_Master_Project_File.md
+2. docs/SeeRight_OnePager.txt
+3. docs/SeeRight_Provisional_Draft.txt
+4. PROJECT_INDEX.md
 
-## Demo
+## Repo structure
+- docs/       core documents + deck/roadmap
+- app/        runnable demos (web/pwa)
+- design/     logos + diagrams
+- ops/        packaging + deployment notes
+- legal/      NDA and legal templates
+- sales/      outreach lists + positioning
+- mobile/     android skeleton
+- vr/         VR + shader notes
+- legacy/     local archives (not pushed)
 
-Enter your sphere value and toggle before/after to see the effect.
-
-Runs entirely in the browser. No login. No data stored.
+## Rule
+The repo root stays clean.

@@ -1,0 +1,84 @@
+SeeRight – Full Conversation Archive
+
+Project Initialization
+
+Goal: Organize files, validate structure, ensure correct deployment, and
+prepare for traction. Files referenced: - SeeRight_OnePager.txt -
+SeeRight_Provisional_Draft.txt - SeeRight_package.zip -
+SeeRight_complete_bundle.zip
+
+Patent Status
+
+-   No patent filed
+-   No patent-pending status
+-   Defensive disclosure discussed
+-   Outreach letters discussed (Google, Android, FDA, EssilorLuxottica)
+
+Strategic Pivot
+
+Shifted focus from legal positioning to traction. Reddit strategy: -
+Collect early users - Gather testimonials - Validate engagement -
+Present traction instead of idea
+
+MVP Development
+
+Tech stack: - Static HTML - WebGL shader - Sphere input - Before/After
+toggle - GitHub Pages deployment
+
+Deployment Issues Resolved
+
+-   404 errors
+-   Jekyll conflicts
+-   .nojekyll implementation
+-   GitHub Actions static deployment
+-   index.html folder mistake
+-   Shader compile errors
+-   Texture flip and mirroring issues
+-   Cached texture not redrawing
+-   Broken HTML syntax
+-   Placeholder early-access link mistake
+
+Chart Rendering Upgrade
+
+-   Removed blurry PNG dependency
+-   Implemented 2048x2048 procedural Canvas chart
+-   Uploaded to WebGL texture
+-   Achieved crisp rendering
+
+Distortion Model
+
+Radial polynomial correction:
+
+vec2 c = uv - 0.5; float r2 = dot(c, c); float k1 = sphere * 0.06; float
+k2 = sphere * 0.02; float factor = 1.0 + k1 * r2 + k2 * r2 * r2; uv =
+0.5 + c * factor; uv = clamp(uv, 0.002, 0.998);
+
+Added optional blur simulation tied to sphere magnitude.
+
+Business Model Discussed
+
+-   Free tier
+-   Premium subscription ($5–$10/month)
+-   B2B licensing
+-   OEM partnerships
+
+Roadmap
+
+Phase 1: Web MVP (Complete) Phase 2: Cylinder + Axis Phase 3: Android
+native build Phase 4: VR integration Phase 5: OEM licensing
+
+Current Status
+
+-   Live demo operational
+-   Distortion tuned
+-   Procedural crisp chart
+-   Early access capture active
+-   GitHub Pages stable
+
+Core Identity
+
+SeeRight is: - Accessibility-focused - Display-level correction - Not
+medical - Privacy-first - GPU-based - Browser-native - Scalable to
+Android and VR
+
+End of File
