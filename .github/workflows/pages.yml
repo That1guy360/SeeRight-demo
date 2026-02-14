@@ -1,4 +1,4 @@
-﻿name: Deploy web-demo to GitHub Pages
+﻿name: Deploy SeeRight (classic) to GitHub Pages
 
 on:
   push:
@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,28 +24,11 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install
-        working-directory: app/web-demo
-        run: npm install
-
-      - name: Build
-        working-directory: app/web-demo
-        run: npm run build
-
-      - name: Upload Pages artifact
+      - name: Upload Pages artifact (classic demo only)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: app/web-demo/dist
+          path: app/web-demo/public/classic
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
