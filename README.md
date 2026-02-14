@@ -12,7 +12,9 @@ No login. No uploads. Runs locally in your browser.
 
 # https://that1guy360.github.io/SeeRight-demo/classic/
 
-# <video src="design/seeright-demo-short.mp4" controls width="700"></video>
+## Preview
+
+![SeeRight Demo](assets/demo-preview.png)
 
 # SeeRight
 
