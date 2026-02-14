@@ -1,4 +1,14 @@
-﻿# SeeRight
+# SeeRight
+
+🔎 Live Demo (No Camera):  
+https://that1guy360.github.io/SeeRight-demo/
+
+---
+
+SeeRight is a browser-based optical correction demo exploring real-time visual distortion modeling using WebGL.
+
+No login. No uploads. Runs locally in your browser.
+
 
 ## Start here (in order)
 1. docs/C-Right_Master_Project_File.md
