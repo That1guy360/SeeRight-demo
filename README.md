@@ -1,7 +1,7 @@
 # SeeRight
 
 🔎 Live Demo (No Camera):  
-https://that1guy360.github.io/SeeRight-demo/
+https://that1guy360.github.io/SeeRight-demo/classic/
 
 ---
 
