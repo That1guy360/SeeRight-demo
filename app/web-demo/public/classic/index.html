@@ -39,14 +39,17 @@
     <!-- Hidden chart image used as the WebGL texture -->
     <img id="chart" src="./SeeRight_Chart.png" alt="SeeRight chart" crossorigin="anonymous" style="display:none;" />
 
-    <div class="row">
-      <div>Did this improve clarity?</div>
-      <div class="controls" style="margin-top:8px;">
-        <button id="fbYes">Yes</button>
-        <button id="fbNo">No</button>
-      </div>
-      <div id="msg"></div>
+    <div class="controls">
+      <input type="number" id="sphere" placeholder="Sphere (e.g., -2.00)" step="0.25" />
+
+      <input type="number" id="cyl" placeholder="Cylinder (e.g., -1.00)" step="0.25" />
+
+      <input type="number" id="axis" placeholder="Axis (0–180)" step="1" min="0" max="180" />
+
+      <button id="applyBtn">Apply</button>
+      <button id="toggleBtn">Before / After</button>
     </div>
+
 
     <div class="card">
       <h3>Get early access</h3>
