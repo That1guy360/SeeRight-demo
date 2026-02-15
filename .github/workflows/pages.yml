@@ -27,7 +27,8 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: app/web-demo/public
+        path: app/web-demo/public/classic
+
 
       - name: Deploy to GitHub Pages
         id: deployment
