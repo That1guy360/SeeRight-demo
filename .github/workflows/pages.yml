@@ -1,4 +1,4 @@
-name: Deploy SeeRight (classic) to GitHub Pages
+name: Deploy SeeRight to GitHub Pages
 
 on:
   push:
