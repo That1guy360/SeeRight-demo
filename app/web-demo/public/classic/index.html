@@ -1,270 +1,417 @@
-﻿<html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SeeRight Classic</title>
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  margin:0;
-  padding:24px;
-  background:#111;
-  color:#fff;
-  text-align:center;
-}
-.wrap { max-width: 820px; margin: 0 auto; }
-.controls {
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  justify-content:center;
-  margin-bottom:14px;
-}
-input {
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #333;
-  background:#0b0b0b;
-  color:#fff;
-  width:160px;
-}
-button {
-  padding:10px 14px;
-  border-radius:10px;
-  border:1px solid #fff;
-  background:transparent;
-  color:#fff;
-  cursor:pointer;
-}
-canvas {
-  background:#fff;
-  border-radius:12px;
-  margin-top:14px;
-}
-#err {
-  margin-top:14px;
-  background:#300;
-  padding:10px;
-  display:none;
-  white-space:pre-wrap;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SeeRight (Classic)</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:0; padding:24px; background:#0b0b0f; color:#fff; text-align:center; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    h1 { margin: 0 0 8px 0; font-size: 28px; }
+    .sub { opacity: 0.88; margin: 0 0 18px 0; }
+    .controls { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin: 12px 0 12px 0; }
+    input, select { padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:#0f1018; color:#fff; width:180px; }
+    input[type="number"] { appearance: textfield; }
+    button { padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.65); background:transparent; color:#fff; cursor:pointer; }
+    button:hover { border-color:#fff; }
+    button:active { transform: translateY(1px); }
+    label { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0f1018; }
+    canvas { background:#fff; border-radius:12px; box-shadow: 0 14px 40px rgba(0,0,0,.35); width: min(92vw, 640px); height: min(92vw, 640px); }
+    .row { margin-top: 14px; }
+    .card { margin:18px auto 0 auto; max-width:720px; text-align:left; border:1px solid rgba(255,255,255,.16); border-radius:14px; padding:14px; background: rgba(255,255,255,.03); }
+    .card h3 { margin:0 0 6px 0; font-size: 16px; }
+    .muted { opacity:.85; font-size: 14px; line-height: 1.35; }
+    .pill { display:inline-block; margin-top:10px; padding:10px 14px; border:1px solid rgba(255,255,255,.65); border-radius:10px; text-decoration:none; color:#fff; }
+    #msg { margin-top:12px; font-size:14px; opacity:.92; min-height:18px; }
+    #err { text-align:left; white-space:pre-wrap; background:#2a0000; color:#fff; padding:10px; border-radius:10px; margin-top:14px; display:none; }
+    iframe { width:100%; border:0; border-radius:12px; background:#fff; }
+    .tiny { font-size: 12px; opacity: .75; margin-top: 6px; }
+    .divider { height:1px; background:rgba(255,255,255,.12); margin:12px 0; }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>SeeRight</h1>
+    <p class="sub">Classic demo (no camera). Enter your prescription and toggle Before/After.</p>
 
-<div class="wrap">
-<h1>SeeRight Classic</h1>
+    <div class="controls">
+      <input type="number" id="sphere" placeholder="SPH (e.g., -2.00)" step="0.25" />
+      <input type="number" id="cyl" placeholder="CYL (e.g., -1.00)" step="0.25" />
+      <input type="number" id="axis" placeholder="AXIS (0–180)" step="1" min="0" max="180" />
+    </div>
 
-<div class="controls">
-  <input type="number" id="sphere" placeholder="Sphere (-2.00)" step="0.25" />
-  <input type="number" id="cyl" placeholder="Cylinder (-1.00)" step="0.25" />
-  <input type="number" id="axis" placeholder="Axis (0–180)" step="1" min="0" max="180" />
-  <button id="applyBtn">Apply</button>
-  <button id="toggleBtn">Before / After</button>
-</div>
+    <div class="controls">
+      <button id="applyBtn">Apply (After)</button>
+      <button id="toggleBtn">Before / After</button>
+      <button id="copyBtn">Copy Presc</button>
+      <button id="shareBtn">Share</button>
+      <label title="For viewers without that prescription (optional)">
+        <input type="checkbox" id="simulateChk" checked />
+        Simulate blur (optional)
+      </label>
+    </div>
 
-<canvas id="glcanvas" width="500" height="500"></canvas>
+    <canvas id="glcanvas"></canvas>
 
-<img id="chart" src="SeeRight_Chart.png" style="display:none;" />
+    <!-- Hidden chart image used as the WebGL texture (must live in same folder as this index.html) -->
+    <img id="chart" src="SeeRight_Chart.png" alt="SeeRight Chart" crossorigin="anonymous" style="display:none;" />
 
-<pre id="err"></pre>
+    <div class="row">
+      <div>Did this improve clarity?</div>
+      <div class="controls" style="margin-top:8px;">
+        <button id="fbYes">Yes</button>
+        <button id="fbNo">No</button>
+      </div>
+      <div id="msg"></div>
+    </div>
 
-<div class="card">
-  <h3>Join Early Access</h3>
-  <div class="muted">
-    Enter your prescription + device. Help improve calibration.
-    No spam. No login required.
+    <pre id="err"></pre>
+
+    <div class="card">
+      <h3>Join early access</h3>
+      <div class="muted">Drop your email + prescription info. No spam. This helps tune the model.</div>
+
+      <div class="divider"></div>
+
+      <!-- Google Form embed (replace the URL below with your exact form embed if you want) -->
+      <iframe
+        src="https://docs.google.com/forms/d/e/1FAIpQLScIigh7GwKQuwz0049LPMuTFxMq7pyNpAKMTndySmCmEwDzQw/viewform?embedded=true"
+        height="980"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+
+      <div class="tiny">
+        If the embed doesn’t load on some devices, open it here:
+        <a class="pill" href="https://docs.google.com/forms/d/e/1FAIpQLScIigh7GwKQuwz0049LPMuTFxMq7pyNpAKMTndySmCmEwDzQw/viewform"
+           target="_blank" rel="noopener">Open Form</a>
+      </div>
+    </div>
   </div>
 
-  <iframe 
-    src="https://docs.google.com/forms/d/e/1FAIpQLScIigh7GwKQuwz0049LPMuTFxMq7pyNpAKMTndySmCmEwDzQw/viewform?embedded=true"
-    width="100%" 
-    height="600"
-    style="border:none; border-radius:12px; margin-top:10px;">
-  </iframe>
-</div>
+  <script>
+    const errBox = document.getElementById("err");
+    const msg = document.getElementById("msg");
 
-<script>
-const canvas = document.getElementById("glcanvas");
-const gl = canvas.getContext("webgl");
-const errBox = document.getElementById("err");
+    function showErr(text){
+      errBox.style.display = "block";
+      errBox.textContent = text;
+    }
 
-function showErr(m){
-  errBox.style.display="block";
-  errBox.textContent=m;
-}
+    window.onerror = (m, s, l, c) => showErr(`JS ERROR: ${m}\n${s}:${l}:${c}`);
 
-if(!gl){
-  showErr("WebGL not supported");
-  throw new Error("WebGL not supported");
-}
+    const canvas = document.getElementById("glcanvas");
+    const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
 
-const vertexShaderSource = `
-attribute vec2 a_position;
-varying vec2 v_uv;
-void main(){
-  v_uv = (a_position * 0.5) + 0.5;
-  gl_Position = vec4(a_position,0.0,1.0);
-}
-`;
+    if (!gl) {
+      showErr("WebGL not available in this browser/device.");
+      throw new Error("WebGL not available");
+    }
 
-const fragmentShaderSource = `
-precision mediump float;
+    // Responsive canvas backing store (keeps it sharp)
+    function resizeCanvas() {
+      const cssSize = Math.min(window.innerWidth * 0.92, 640);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.style.width = cssSize + "px";
+      canvas.style.height = cssSize + "px";
+      canvas.width = Math.floor(cssSize * dpr);
+      canvas.height = Math.floor(cssSize * dpr);
+    }
+    resizeCanvas();
 
-uniform sampler2D u_tex;
-uniform float u_sphere;
-uniform float u_cyl;
-uniform float u_axis;
-uniform bool u_apply;
-uniform vec2 u_px;
+    const vertexShaderSource = `
+      attribute vec2 a_position;
+      varying vec2 v_uv;
+      void main() {
+        v_uv = (a_position * 0.5) + 0.5;
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `;
 
-varying vec2 v_uv;
+    const fragmentShaderSource = `
+      precision mediump float;
 
-vec4 blur9(sampler2D t, vec2 uv, vec2 px, float amt){
-  vec2 r = px * amt;
-  vec4 c = vec4(0.0);
-  c += texture2D(t, uv + r*vec2(-1.0,-1.0))*0.0625;
-  c += texture2D(t, uv + r*vec2(0.0,-1.0))*0.125;
-  c += texture2D(t, uv + r*vec2(1.0,-1.0))*0.0625;
-  c += texture2D(t, uv + r*vec2(-1.0,0.0))*0.125;
-  c += texture2D(t, uv + r*vec2(0.0,0.0))*0.25;
-  c += texture2D(t, uv + r*vec2(1.0,0.0))*0.125;
-  c += texture2D(t, uv + r*vec2(-1.0,1.0))*0.0625;
-  c += texture2D(t, uv + r*vec2(0.0,1.0))*0.125;
-  c += texture2D(t, uv + r*vec2(1.0,1.0))*0.0625;
-  return c;
-}
+      uniform sampler2D u_tex;
+      uniform float u_sphere;
+      uniform float u_cyl;
+      uniform float u_axis;   // radians
+      uniform bool  u_apply;
 
-void main(){
-  vec2 uv = v_uv;
-  uv.y = 1.0 - uv.y;
+      uniform bool u_sim;     // optional blur sim for "Before"
+      uniform vec2 u_px;      // 1.0/width, 1.0/height
 
-  float s = clamp(u_sphere, -10.0, 10.0);
-  float cyl = clamp(u_cyl, -6.0, 6.0);
-  float axis = radians(u_axis);
+      varying vec2 v_uv;
 
-  float strength = abs(s) + abs(cyl)*0.5;
-  vec4 base = blur9(u_tex, uv, u_px, strength*1.5);
+      vec2 rotate2(vec2 p, float a) {
+        float c = cos(a), s = sin(a);
+        return vec2(c*p.x - s*p.y, s*p.x + c*p.y);
+      }
 
-  if(u_apply){
-    vec2 c = uv - 0.5;
-    float r2 = dot(c,c);
+      vec2 distort(vec2 uv, float sphere, float cyl, float axisRad) {
+        vec2 c = uv - 0.5;
 
-    float k1 = s * 0.06;
-    float k2 = s * 0.02;
+        // rotate into cylinder axis space
+        vec2 r = rotate2(c, axisRad);
+        float r2 = dot(c, c);
 
-    float factor = 1.0 + k1*r2 + k2*r2*r2;
+        // Sphere (radial polynomial)
+        float s = clamp(sphere, -12.0, 12.0);
+        float k1 = s * 0.06;
+        float k2 = s * 0.02;
+        float sf = 1.0 + k1 * r2 + k2 * r2 * r2;
+        r *= sf;
 
-    float angleFactor = cos(axis)*c.x + sin(axis)*c.y;
-    factor += cyl * 0.02 * angleFactor;
+        // Cylinder (anisotropic along x in axis space)
+        float cy = clamp(cyl, -8.0, 8.0);
+        float kc = cy * 0.04;
+        float cf = 1.0 + kc * r2;
+        r.x *= cf;
 
-    uv = 0.5 + c * factor;
-    uv = clamp(uv,0.002,0.998);
-    gl_FragColor = texture2D(u_tex, uv);
-  }else{
-    gl_FragColor = base;
-  }
-}
-`;
+        // rotate back
+        vec2 outc = rotate2(r, -axisRad);
+        return 0.5 + outc;
+      }
 
-function compile(type,source){
-  const s=gl.createShader(type);
-  gl.shaderSource(s,source);
-  gl.compileShader(s);
-  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){
-    showErr(gl.getShaderInfoLog(s));
-    throw new Error("Shader compile fail");
-  }
-  return s;
-}
+      vec4 blur9(sampler2D t, vec2 uv, vec2 px, float amt) {
+        vec2 r = px * amt;
+        vec4 c = vec4(0.0);
+        c += texture2D(t, uv + r*vec2(-1.0,-1.0)) * 0.0625;
+        c += texture2D(t, uv + r*vec2( 0.0,-1.0)) * 0.1250;
+        c += texture2D(t, uv + r*vec2( 1.0,-1.0)) * 0.0625;
 
-const vs=compile(gl.VERTEX_SHADER,vertexShaderSource);
-const fs=compile(gl.FRAGMENT_SHADER,fragmentShaderSource);
+        c += texture2D(t, uv + r*vec2(-1.0, 0.0)) * 0.1250;
+        c += texture2D(t, uv + r*vec2( 0.0, 0.0)) * 0.2500;
+        c += texture2D(t, uv + r*vec2( 1.0, 0.0)) * 0.1250;
 
-const program=gl.createProgram();
-gl.attachShader(program,vs);
-gl.attachShader(program,fs);
-gl.linkProgram(program);
+        c += texture2D(t, uv + r*vec2(-1.0, 1.0)) * 0.0625;
+        c += texture2D(t, uv + r*vec2( 0.0, 1.0)) * 0.1250;
+        c += texture2D(t, uv + r*vec2( 1.0, 1.0)) * 0.0625;
+        return c;
+      }
 
-if(!gl.getProgramParameter(program,gl.LINK_STATUS)){
-  showErr(gl.getProgramInfoLog(program));
-  throw new Error("Program link fail");
-}
+      void main() {
+        vec2 uv = v_uv;
 
-gl.useProgram(program);
+        // keep chart upright
+        uv.y = 1.0 - uv.y;
 
-const buffer=gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
-gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([
--1,-1,1,-1,-1,1,
--1,1,1,-1,1,1
-]),gl.STATIC_DRAW);
+        // "After": pre-distort display with the inverse of the prescription
+        if (u_apply) {
+          vec2 d = distort(uv, -u_sphere, -u_cyl, u_axis);
+          d = clamp(d, 0.002, 0.998);
+          gl_FragColor = texture2D(u_tex, d);
+          return;
+        }
 
-const posLoc=gl.getAttribLocation(program,"a_position");
-gl.enableVertexAttribArray(posLoc);
-gl.vertexAttribPointer(posLoc,2,gl.FLOAT,false,0,0);
+        // "Before": normal chart, optionally blurred for demonstration
+        if (u_sim) {
+          float strength = clamp(abs(u_sphere) + 0.6*abs(u_cyl), 0.0, 12.0);
+          float amt = strength * 1.6; // blur radius scale
+          vec4 b = blur9(u_tex, uv, u_px, amt);
+          gl_FragColor = b;
+        } else {
+          gl_FragColor = texture2D(u_tex, uv);
+        }
+      }
+    `;
 
-const sphereLoc=gl.getUniformLocation(program,"u_sphere");
-const cylLoc=gl.getUniformLocation(program,"u_cyl");
-const axisLoc=gl.getUniformLocation(program,"u_axis");
-const applyLoc=gl.getUniformLocation(program,"u_apply");
-const texLoc=gl.getUniformLocation(program,"u_tex");
-const pxLoc=gl.getUniformLocation(program,"u_px");
+    function compileShader(type, source) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, source);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        const info = gl.getShaderInfoLog(sh) || "Unknown shader error";
+        showErr("SHADER COMPILE FAIL:\n" + info);
+        throw new Error(info);
+      }
+      return sh;
+    }
 
-gl.uniform2f(pxLoc,1.0/canvas.width,1.0/canvas.height);
+    const vs = compileShader(gl.VERTEX_SHADER, vertexShaderSource);
+    const fs = compileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-gl.uniform1i(texLoc,0);
-gl.uniform1i(applyLoc,0);
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
 
-const texture=gl.createTexture();
-gl.bindTexture(gl.TEXTURE_2D,texture);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      const info = gl.getProgramInfoLog(program) || "Unknown program link error";
+      showErr("PROGRAM LINK FAIL:\n" + info);
+      throw new Error(info);
+    }
 
-const chart=document.getElementById("chart");
+    gl.useProgram(program);
 
-function upload(){
-  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,chart);
-  draw();
-}
+    // Fullscreen quad
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1,  1, -1, -1,  1,
+      -1,  1,  1, -1,  1,  1
+    ]), gl.STATIC_DRAW);
 
-chart.onload=upload;
-if(chart.complete && chart.naturalWidth>0){ upload(); }
+    const posLoc = gl.getAttribLocation(program, "a_position");
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-function draw(){
-  gl.viewport(0,0,canvas.width,canvas.height);
-  gl.clearColor(1,1,1,1);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.drawArrays(gl.TRIANGLES,0,6);
-}
+    // Uniforms
+    const sphereLoc = gl.getUniformLocation(program, "u_sphere");
+    const cylLoc    = gl.getUniformLocation(program, "u_cyl");
+    const axisLoc   = gl.getUniformLocation(program, "u_axis");
+    const applyLoc  = gl.getUniformLocation(program, "u_apply");
+    const simLoc    = gl.getUniformLocation(program, "u_sim");
+    const pxLoc     = gl.getUniformLocation(program, "u_px");
+    const texLoc    = gl.getUniformLocation(program, "u_tex");
 
-let applied=false;
+    // Texture setup
+    const texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1i(texLoc, 0);
 
-document.getElementById("applyBtn").onclick=()=>{
-  const s=parseFloat(document.getElementById("sphere").value)||0;
-  const c=parseFloat(document.getElementById("cyl").value)||0;
-  const a=parseFloat(document.getElementById("axis").value)||0;
+    // 1x1 placeholder until image loads
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255,255,255,255]));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-  gl.uniform1f(sphereLoc,s);
-  gl.uniform1f(cylLoc,c);
-  gl.uniform1f(axisLoc,a);
+    function setPxUniform() {
+      gl.uniform2f(pxLoc, 1.0 / canvas.width, 1.0 / canvas.height);
+    }
 
-  applied=true;
-  gl.uniform1i(applyLoc,1);
-  draw();
-};
+    function draw() {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(1, 1, 1, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
 
-document.getElementById("toggleBtn").onclick=()=>{
-  applied=!applied;
-  gl.uniform1i(applyLoc,applied?1:0);
-  draw();
-};
+    const chartImg = document.getElementById("chart");
 
-draw();
-</script>
+    function uploadChartTextureAndDraw() {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, chartImg);
+      draw();
+    }
+
+    chartImg.onload = uploadChartTextureAndDraw;
+    chartImg.onerror = () => showErr("Image failed to load: SeeRight_Chart.png (must be in /classic/ folder).");
+
+    if (chartImg.complete && chartImg.naturalWidth > 0) {
+      uploadChartTextureAndDraw();
+    }
+
+    // State
+    let applyEffect = false;
+
+    function readInputs() {
+      const sphere = parseFloat(document.getElementById("sphere").value) || 0.0;
+      const cyl    = parseFloat(document.getElementById("cyl").value) || 0.0;
+
+      let axisDeg  = parseFloat(document.getElementById("axis").value);
+      if (isNaN(axisDeg)) axisDeg = 90;
+      axisDeg = Math.max(0, Math.min(180, axisDeg));
+      const axisRad = axisDeg * Math.PI / 180.0;
+
+      return { sphere, cyl, axisDeg, axisRad };
+    }
+
+    function applyUniforms() {
+      const { sphere, cyl, axisRad } = readInputs();
+      const simOn = document.getElementById("simulateChk").checked;
+
+      gl.uniform1f(sphereLoc, sphere);
+      gl.uniform1f(cylLoc, cyl);
+      gl.uniform1f(axisLoc, axisRad);
+      gl.uniform1i(simLoc, simOn ? 1 : 0);
+      setPxUniform();
+    }
+
+    // Buttons
+    document.getElementById("applyBtn").onclick = () => {
+      applyUniforms();
+      applyEffect = true;
+      gl.uniform1i(applyLoc, 1);
+      draw();
+      if (msg) msg.textContent = "Applied (After). Toggle to compare.";
+    };
+
+    document.getElementById("toggleBtn").onclick = () => {
+      applyUniforms();
+      applyEffect = !applyEffect;
+      gl.uniform1i(applyLoc, applyEffect ? 1 : 0);
+      draw();
+      if (msg) msg.textContent = applyEffect ? "After" : "Before";
+    };
+
+    document.getElementById("simulateChk").onchange = () => {
+      applyUniforms();
+      draw();
+    };
+
+    document.getElementById("copyBtn").onclick = async () => {
+      const { sphere, cyl, axisDeg } = readInputs();
+      const text = `SPH ${sphere.toFixed(2)}, CYL ${cyl.toFixed(2)}, AXIS ${Math.round(axisDeg)}`;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        if (msg) msg.textContent = "Prescription copied.";
+      } catch {
+        window.prompt("Copy this:", text);
+        if (msg) msg.textContent = "Copy the text above.";
+      }
+    };
+
+    // Share
+    document.getElementById("shareBtn").onclick = async () => {
+      const url = window.location.href;
+      const shareData = {
+        title: "SeeRight",
+        text: "Try SeeRight (classic demo) — no camera, runs in-browser.",
+        url
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+          if (msg) msg.textContent = "Shared.";
+        } else {
+          try {
+            await navigator.clipboard.writeText(url);
+            if (msg) msg.textContent = "Link copied — paste it anywhere.";
+          } catch {
+            window.prompt("Copy this link:", url);
+            if (msg) msg.textContent = "Copy the link above.";
+          }
+        }
+      } catch {
+        if (msg) msg.textContent = "Share canceled.";
+      }
+    };
+
+    // Feedback
+    document.getElementById("fbYes").onclick = () => {
+      if (msg) msg.textContent = "Thanks. Drop your prescription + device in the form below.";
+    };
+    document.getElementById("fbNo").onclick = () => {
+      const { sphere, cyl, axisDeg } = readInputs();
+      if (msg) msg.textContent = `Thanks. Please submit: SPH ${sphere.toFixed(2)}, CYL ${cyl.toFixed(2)}, AXIS ${Math.round(axisDeg)} + device model.`;
+    };
+
+    // Init defaults + draw
+    applyUniforms();
+    gl.uniform1i(applyLoc, 0);
+    draw();
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      applyUniforms();
+      draw();
+    });
+  </script>
 </body>
 </html>
