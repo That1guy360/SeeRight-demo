@@ -1,4 +1,4 @@
-﻿name: Deploy SeeRight (classic) to GitHub Pages
+name: Deploy SeeRight (classic) to GitHub Pages
 
 on:
   push:
@@ -24,11 +24,10 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Pages artifact (classic demo only)
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: app/web-demo/public/classic
+          path: app/web-demo/public
 
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
