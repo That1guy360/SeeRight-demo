@@ -1,4 +1,4 @@
-name: Deploy SeeRight (classic) to GitHub Pages
+name: Deploy SeeRight to GitHub Pages
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-        path: app/web-demo/public/classic
+        path: app/web-demo/public/
 
 
       - name: Deploy to GitHub Pages
