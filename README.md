@@ -2,24 +2,6 @@
 
 **Live Demo:** https://that1guy360.github.io/SeeRight-demo/
 
-<<<<<<< HEAD
-**Short Video:** (in this repo) `app/web-demo/public/classic/seeright-demo.mp4`
+https://github.com/user-attachments/assets/45135fc8-8eeb-4f4e-b90c-bd219088eba7
 
-## Preview
-![SeeRight Demo](assets/demo-preview.png)
-=======
-# \*\*Live Demo:\*\* https://that1guy360.github.io/SeeRight-demo/
-
-# 
-
-# \*\*Short Video:\*\* (in this repo) `app/web-demo/public/classic/seeright-demo.mp4`
-
-# 
-
-# \## Preview
-
-# !\[SeeRight Demo](assets/demo-preview.png)
-
-# 
->>>>>>> b2cd588 (Clean README: demo + video)
-
+<img width="1024" height="1536" alt="SeeRight_Chart" src="https://github.com/user-attachments/assets/b66c9e5e-de3b-430d-a43d-156fc1f08171" />
