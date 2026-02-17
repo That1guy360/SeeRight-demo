@@ -1,35 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SeeRight</title>
+  <title>SeeRight (Classic)</title>
+
   <style>
     :root { color-scheme: dark; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:0; padding:24px; background:#0b0b0f; color:#fff; text-align:center; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #0b0b0f;
+      color: #fff;
+      text-align: center;
+    }
     .wrap { max-width: 980px; margin: 0 auto; }
     h1 { margin: 0 0 8px 0; font-size: 28px; }
     .sub { opacity: 0.88; margin: 0 0 18px 0; }
-    .controls { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; margin: 12px 0 12px 0; }
-    input, select { padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:#0f1018; color:#fff; width:180px; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    input, select {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: #0f1018;
+      color: #fff;
+      width: 180px;
+    }
     input[type="number"] { appearance: textfield; }
-    button { padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.65); background:transparent; color:#fff; cursor:pointer; }
-    button:hover { border-color:#fff; }
+
+    button {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.65);
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover { border-color: #fff; }
     button:active { transform: translateY(1px); }
-    label { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0f1018; }
-    canvas { background:#fff; border-radius:12px; box-shadow: 0 14px 40px rgba(0,0,0,.35); width: min(92vw, 640px); height: min(92vw, 640px); }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #0f1018;
+    }
+
+    canvas {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      width: min(92vw, 640px);
+      height: min(92vw, 640px);
+    }
+
     .row { margin-top: 14px; }
-    .card { margin:18px auto 0 auto; max-width:720px; text-align:left; border:1px solid rgba(255,255,255,.16); border-radius:14px; padding:14px; background: rgba(255,255,255,.03); }
-    .card h3 { margin:0 0 6px 0; font-size: 16px; }
-    .muted { opacity:.85; font-size: 14px; line-height: 1.35; }
-    .pill { display:inline-block; margin-top:10px; padding:10px 14px; border:1px solid rgba(255,255,255,.65); border-radius:10px; text-decoration:none; color:#fff; }
-    #msg { margin-top:12px; font-size:14px; opacity:.92; min-height:18px; }
-    #err { text-align:left; white-space:pre-wrap; background:#2a0000; color:#fff; padding:10px; border-radius:10px; margin-top:14px; display:none; }
-    iframe { width:100%; border:0; border-radius:12px; background:#fff; }
+
+    .card {
+      margin: 18px auto 0 auto;
+      max-width: 720px;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(255,255,255,.03);
+    }
+    .card h3 { margin: 0 0 6px 0; font-size: 16px; }
+    .muted { opacity: .85; font-size: 14px; line-height: 1.35; }
+
+    .pill {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: 10px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    #msg { margin-top: 12px; font-size: 14px; opacity: .92; min-height: 18px; }
+
+    #err {
+      text-align: left;
+      white-space: pre-wrap;
+      background: #2a0000;
+      color: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 14px;
+      display: none;
+    }
+
+    iframe { width: 100%; border: 0; border-radius: 12px; background: #fff; }
     .tiny { font-size: 12px; opacity: .75; margin-top: 6px; }
-    .divider { height:1px; background:rgba(255,255,255,.12); margin:12px 0; }
+    .divider { height: 1px; background: rgba(255,255,255,.12); margin: 12px 0; }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <h1>SeeRight</h1>
@@ -39,15 +119,15 @@
       <input type="number" id="sphere" placeholder="SPH (e.g., -2.00)" step="0.25" />
       <input type="number" id="cyl" placeholder="CYL (e.g., -1.00)" step="0.25" />
       <input type="number" id="axis" placeholder="AXIS (0–180)" step="1" min="0" max="180" />
-      <input type="number" id="zoom" placeholder="Distance/Zoom (1.00)" step="0.05" value="1.00" min="0.50" max="2.00" />
     </div>
 
     <div class="controls">
-      <button id="applyBtn">Apply (After)</button>
-      <button id="toggleBtn">Before / After</button>
-      <button id="copyBtn">Copy Presc</button>
-      <button id="shareBtn">Share</button>
-      <label title="For viewers without that prescription (optional)">
+      <button id="applyBtn" type="button">Apply (After)</button>
+      <button id="toggleBtn" type="button">Before / After</button>
+      <button id="copyBtn" type="button">Copy Presc</button>
+      <button id="shareBtn" type="button">Share</button>
+
+      <label title="Optional blur for viewers who don't match the prescription">
         <input type="checkbox" id="simulateChk" checked />
         Simulate blur (optional)
       </label>
@@ -55,14 +135,21 @@
 
     <canvas id="glcanvas"></canvas>
 
-    <!-- MUST be in SAME folder as this file -->
-    <img id="chart" src="classic/SeeRight_Chart.png" alt="SeeRight Chart" crossorigin="anonymous" style="display:none;" />
+    <!-- Chart image used as the WebGL texture.
+         Path is relative to this page: /classic/SeeRight_Chart.png -->
+    <img
+      id="chart"
+      src="classic/SeeRight_Chart.png"
+      alt="SeeRight Chart"
+      crossorigin="anonymous"
+      style="display:none;"
+    />
 
     <div class="row">
       <div>Did this improve clarity?</div>
       <div class="controls" style="margin-top:8px;">
-        <button id="fbYes">Yes</button>
-        <button id="fbNo">No</button>
+        <button id="fbYes" type="button">Yes</button>
+        <button id="fbNo" type="button">No</button>
       </div>
       <div id="msg"></div>
     </div>
@@ -71,7 +158,7 @@
 
     <div class="card">
       <h3>Join early access</h3>
-      <div class="muted">Drop your email + prescription info. No spam. This helps tune the model.</div>
+      <div class="muted">Drop your email + prescription info. No spam.</div>
 
       <div class="divider"></div>
 
@@ -84,8 +171,12 @@
 
       <div class="tiny">
         If the embed doesn’t load on some devices, open it here:
-        <a class="pill" href="https://docs.google.com/forms/d/e/1FAIpQLScIigh7GwKQuwz0049LPMuTFxMq7pyNpAKMTndySmCmEwDzQw/viewform"
-           target="_blank" rel="noopener">Open Form</a>
+        <a
+          class="pill"
+          href="https://docs.google.com/forms/d/e/1FAIpQLScIigh7GwKQuwz0049LPMuTFxMq7pyNpAKMTndySmCmEwDzQw/viewform"
+          target="_blank"
+          rel="noopener"
+        >Open Form</a>
       </div>
     </div>
   </div>
@@ -94,10 +185,11 @@
     const errBox = document.getElementById("err");
     const msg = document.getElementById("msg");
 
-    function showErr(text){
+    function showErr(text) {
       errBox.style.display = "block";
       errBox.textContent = text;
     }
+
     window.onerror = (m, s, l, c) => showErr(`JS ERROR: ${m}\n${s}:${l}:${c}`);
 
     const canvas = document.getElementById("glcanvas");
@@ -108,6 +200,7 @@
       throw new Error("WebGL not available");
     }
 
+    // Responsive canvas backing store (keeps it sharp)
     function resizeCanvas() {
       const cssSize = Math.min(window.innerWidth * 0.92, 640);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -134,11 +227,10 @@
       uniform float u_sphere;
       uniform float u_cyl;
       uniform float u_axis;   // radians
-      uniform float u_zoom;   // 0.5..2.0
       uniform bool  u_apply;
 
-      uniform bool u_sim;
-      uniform vec2 u_px;
+      uniform bool u_sim;     // optional blur sim for "Before"
+      uniform vec2 u_px;      // 1.0/width, 1.0/height
 
       varying vec2 v_uv;
 
@@ -150,20 +242,24 @@
       vec2 distort(vec2 uv, float sphere, float cyl, float axisRad) {
         vec2 c = uv - 0.5;
 
+        // rotate into cylinder axis space
         vec2 r = rotate2(c, axisRad);
         float r2 = dot(c, c);
 
+        // Sphere (radial polynomial)
         float s = clamp(sphere, -12.0, 12.0);
         float k1 = s * 0.06;
         float k2 = s * 0.02;
         float sf = 1.0 + k1 * r2 + k2 * r2 * r2;
         r *= sf;
 
+        // Cylinder (anisotropic along x in axis space)
         float cy = clamp(cyl, -8.0, 8.0);
         float kc = cy * 0.04;
         float cf = 1.0 + kc * r2;
         r.x *= cf;
 
+        // rotate back
         vec2 outc = rotate2(r, -axisRad);
         return 0.5 + outc;
       }
@@ -188,12 +284,10 @@
       void main() {
         vec2 uv = v_uv;
 
-        // ZOOM around center
-        uv = (uv - 0.5) / u_zoom + 0.5;
-
         // keep chart upright
         uv.y = 1.0 - uv.y;
 
+        // "After": pre-distort display with the inverse of the prescription
         if (u_apply) {
           vec2 d = distort(uv, -u_sphere, -u_cyl, u_axis);
           d = clamp(d, 0.002, 0.998);
@@ -201,9 +295,10 @@
           return;
         }
 
+        // "Before": normal chart, optionally blurred for demonstration
         if (u_sim) {
           float strength = clamp(abs(u_sphere) + 0.6*abs(u_cyl), 0.0, 12.0);
-          float amt = strength * 1.6;
+          float amt = strength * 1.6; // blur radius scale
           gl_FragColor = blur9(u_tex, uv, u_px, amt);
         } else {
           gl_FragColor = texture2D(u_tex, uv);
@@ -239,6 +334,7 @@
 
     gl.useProgram(program);
 
+    // Fullscreen quad
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
@@ -250,21 +346,28 @@
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
+    // Uniforms
     const sphereLoc = gl.getUniformLocation(program, "u_sphere");
     const cylLoc    = gl.getUniformLocation(program, "u_cyl");
     const axisLoc   = gl.getUniformLocation(program, "u_axis");
-    const zoomLoc   = gl.getUniformLocation(program, "u_zoom");
     const applyLoc  = gl.getUniformLocation(program, "u_apply");
     const simLoc    = gl.getUniformLocation(program, "u_sim");
     const pxLoc     = gl.getUniformLocation(program, "u_px");
     const texLoc    = gl.getUniformLocation(program, "u_tex");
 
+    // Texture setup
     const texture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.uniform1i(texLoc, 0);
 
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255,255,255,255]));
+    // 1x1 placeholder until image loads
+    gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA,
+      1, 1, 0,
+      gl.RGBA, gl.UNSIGNED_BYTE,
+      new Uint8Array([255, 255, 255, 255])
+    );
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -291,38 +394,40 @@
     }
 
     chartImg.onload = uploadChartTextureAndDraw;
-    chartImg.onerror = () => showErr("Image failed to load: classic/SeeRight_Chart.png (must exist in repo).");
+    chartImg.onerror = () =>
+      showErr('Image failed to load: classic/SeeRight_Chart.png (check the file path).');
 
-    if (chartImg.complete && chartImg.naturalWidth > 0) uploadChartTextureAndDraw();
+    if (chartImg.complete && chartImg.naturalWidth > 0) {
+      uploadChartTextureAndDraw();
+    }
 
+    // State
     let applyEffect = false;
 
     function readInputs() {
       const sphere = parseFloat(document.getElementById("sphere").value) || 0.0;
       const cyl    = parseFloat(document.getElementById("cyl").value) || 0.0;
 
-      let axisDeg  = parseFloat(document.getElementById("axis").value);
-      if (isNaN(axisDeg)) axisDeg = 90;
+      let axisDeg = parseFloat(document.getElementById("axis").value);
+      if (Number.isNaN(axisDeg)) axisDeg = 90;
       axisDeg = Math.max(0, Math.min(180, axisDeg));
-      const axisRad = axisDeg * Math.PI / 180.0;
 
-      let zoom = parseFloat(document.getElementById("zoom").value);
-      if (isNaN(zoom)) zoom = 1.0;
-      zoom = Math.max(0.5, Math.min(2.0, zoom));
-
-      return { sphere, cyl, axisDeg, axisRad, zoom };
+      return {
+        sphere,
+        cyl,
+        axisDeg,
+        axisRad: axisDeg * Math.PI / 180.0
+      };
     }
 
     function applyUniforms() {
-      const { sphere, cyl, axisRad, zoom } = readInputs();
+      const { sphere, cyl, axisRad } = readInputs();
       const simOn = document.getElementById("simulateChk").checked;
 
       gl.uniform1f(sphereLoc, sphere);
       gl.uniform1f(cylLoc, cyl);
       gl.uniform1f(axisLoc, axisRad);
-      gl.uniform1f(zoomLoc, zoom);
       gl.uniform1i(simLoc, simOn ? 1 : 0);
-
       setPxUniform();
     }
 
@@ -331,7 +436,7 @@
       applyEffect = true;
       gl.uniform1i(applyLoc, 1);
       draw();
-      if (msg) msg.textContent = "Applied (After). Toggle to compare.";
+      msg.textContent = "Applied (After). Toggle to compare.";
     };
 
     document.getElementById("toggleBtn").onclick = () => {
@@ -339,7 +444,7 @@
       applyEffect = !applyEffect;
       gl.uniform1i(applyLoc, applyEffect ? 1 : 0);
       draw();
-      if (msg) msg.textContent = applyEffect ? "After" : "Before";
+      msg.textContent = applyEffect ? "After" : "Before";
     };
 
     document.getElementById("simulateChk").onchange = () => {
@@ -347,21 +452,16 @@
       draw();
     };
 
-    document.getElementById("zoom").onchange = () => {
-      applyUniforms();
-      draw();
-    };
-
     document.getElementById("copyBtn").onclick = async () => {
-      const { sphere, cyl, axisDeg, zoom } = readInputs();
-      const text = `SPH ${sphere.toFixed(2)}, CYL ${cyl.toFixed(2)}, AXIS ${Math.round(axisDeg)}, ZOOM ${zoom.toFixed(2)}`;
+      const { sphere, cyl, axisDeg } = readInputs();
+      const text = `SPH ${sphere.toFixed(2)}, CYL ${cyl.toFixed(2)}, AXIS ${Math.round(axisDeg)}`;
 
       try {
         await navigator.clipboard.writeText(text);
-        if (msg) msg.textContent = "Prescription copied.";
+        msg.textContent = "Prescription copied.";
       } catch {
         window.prompt("Copy this:", text);
-        if (msg) msg.textContent = "Copy the text above.";
+        msg.textContent = "Copy the text above.";
       }
     };
 
@@ -369,36 +469,39 @@
       const url = window.location.href;
       const shareData = {
         title: "SeeRight",
-        text: "Try SeeRight — no camera, runs in-browser.",
+        text: "Try SeeRight (classic demo) — no camera, runs in-browser.",
         url
       };
 
       try {
         if (navigator.share) {
           await navigator.share(shareData);
-          if (msg) msg.textContent = "Shared.";
+          msg.textContent = "Shared.";
         } else {
           try {
             await navigator.clipboard.writeText(url);
-            if (msg) msg.textContent = "Link copied — paste it anywhere.";
+            msg.textContent = "Link copied — paste it anywhere.";
           } catch {
             window.prompt("Copy this link:", url);
-            if (msg) msg.textContent = "Copy the link above.";
+            msg.textContent = "Copy the link above.";
           }
         }
       } catch {
-        if (msg) msg.textContent = "Share canceled.";
+        msg.textContent = "Share canceled.";
       }
     };
 
     document.getElementById("fbYes").onclick = () => {
-      if (msg) msg.textContent = "Thanks. Drop your prescription + device in the form below.";
-    };
-    document.getElementById("fbNo").onclick = () => {
-      const { sphere, cyl, axisDeg } = readInputs();
-      if (msg) msg.textContent = `Thanks. Please submit: SPH ${sphere.toFixed(2)}, CYL ${cyl.toFixed(2)}, AXIS ${Math.round(axisDeg)} + device model.`;
+      msg.textContent = "Thanks. Drop your prescription + device in the form below.";
     };
 
+    document.getElementById("fbNo").onclick = () => {
+      const { sphere, cyl, axisDeg } = readInputs();
+      msg.textContent =
+        `Thanks. Please submit: SPH ${sphere.toFixed(2)}, CYL ${cyl.toFixed(2)}, AXIS ${Math.round(axisDeg)} + device model.`;
+    };
+
+    // Init defaults + draw
     applyUniforms();
     gl.uniform1i(applyLoc, 0);
     draw();
