@@ -2,7 +2,9 @@
 
 https://that1guy360.github.io/SeeRight-demo/
 
-**Live Demo** 
+#Live Demo#
+
+https://github.com/That1guy360/SeeRight-demo/releases/tag/SeeRight
 
 https://github.com/user-attachments/assets/ab46db1a-a891-4901-b2e7-15bf104b64ee
 
